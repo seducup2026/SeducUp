@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeducUP - Perfil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .card-perfil {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 24px;
+            width: 100%;
+            max-width: 360px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        .card-perfil:hover { transform: scale(1.02); }
+        .icone {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-right: 16px;
+        }
+        .aluno-cor { background: #1565C0; }
+        .professor-cor { background: #2E7D32; }
+        .coordenador-cor { background: #6A1B9A; }
+        .nome-perfil { font-weight: 700; font-size: 1.1rem; }
+        .aluno-txt { color: #1565C0; }
+        .professor-txt { color: #2E7D32; }
+        .coordenador-txt { color: #6A1B9A; }
+        .sub-perfil { color: #888; font-size: 0.85rem; }
+        .seta { color: #ccc; font-size: 1.2rem; }
+        .logo { color: #1565C0; font-weight: 800; font-size: 1.5rem; margin-bottom: 4px; }
+        .seguro { color: #aaa; font-size: 0.78rem; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="text-center mb-4">
+        <div class="logo">🎓 SeducUP</div>
+        <h5 class="fw-bold">Como você acessa?</h5>
+        <p class="text-muted" style="font-size:0.9rem">Selecione o seu perfil para continuar</p>
+    </div>
+
+    <a href="{{ url_for('auth.login', tipo='aluno') }}" class="card-perfil">
+        <div class="d-flex align-items-center">
+            <div class="icone aluno-cor">👨‍🎓</div>
+            <div>
+                <div class="nome-perfil aluno-txt">Aluno</div>
+                <div class="sub-perfil">login com RA</div>
+            </div>
+        </div>
+        <span class="seta">›</span>
+    </a>
+
+    <a href="{{ url_for('auth.login', tipo='professor') }}" class="card-perfil">
+        <div class="d-flex align-items-center">
+            <div class="icone professor-cor">👨‍🏫</div>
+            <div>
+                <div class="nome-perfil professor-txt">Professor</div>
+                <div class="sub-perfil">cadastro com matrícula</div>
+            </div>
+        </div>
+        <span class="seta">›</span>
+    </a>
+
+    <a href="{{ url_for('auth.login', tipo='coordenador') }}" class="card-perfil">
+        <div class="d-flex align-items-center">
+            <div class="icone coordenador-cor">🧑‍💼</div>
+            <div>
+                <div class="nome-perfil coordenador-txt">Coordenador</div>
+                <div class="sub-perfil">cadastro com matrícula</div>
+            </div>
+        </div>
+        <span class="seta">›</span>
+    </a>
+
+    <p class="seguro">🔒 Seu acesso é seguro e seus dados estão protegidos.</p>
+</body>
+</html>
