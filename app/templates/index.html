@@ -1,58 +1,260 @@
 {% extends 'base.html' %}
 
-{% block title %}SeducUP{% endblock %}
+{% block title %}SeducUP — Plataforma de Reconhecimento Estudantil{% endblock %}
 
 {% block extra_css %}
 <style>
-    body {
-        background: #1565C0;
+    /* Override public-layout para o index */
+    .public-layout {
+        padding: 0;
+        background: var(--branco);
+    }
+
+    /* ============================================================
+       LAYOUT SPLIT
+    ============================================================ */
+    .index-wrapper {
+        display: flex;
         min-height: 100vh;
+        width: 100%;
+    }
+
+    /* ---------- PAINEL ESQUERDO (azul) ---------- */
+    .index-left {
+        flex: 1;
+        background: var(--azul-claro);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Padrão de fundo decorativo */
+    .index-left::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image:
+            radial-gradient(circle at 20% 20%, rgba(255,255,255,0.06) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(255,255,255,0.05) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    /* Ícones decorativos de fundo */
+    .index-left-deco {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+    }
+
+    .index-left-deco i {
+        position: absolute;
+        color: rgba(255,255,255,0.07);
+        font-size: 2.5rem;
+    }
+
+    .index-left-deco i:nth-child(1)  { top: 8%;  left: 6%;  font-size: 2rem;   transform: rotate(-15deg); }
+    .index-left-deco i:nth-child(2)  { top: 15%; left: 70%; font-size: 1.8rem; transform: rotate(10deg);  }
+    .index-left-deco i:nth-child(3)  { top: 30%; left: 85%; font-size: 2.2rem; transform: rotate(-8deg);  }
+    .index-left-deco i:nth-child(4)  { top: 55%; left: 5%;  font-size: 1.6rem; transform: rotate(20deg);  }
+    .index-left-deco i:nth-child(5)  { top: 70%; left: 75%; font-size: 2rem;   transform: rotate(-12deg); }
+    .index-left-deco i:nth-child(6)  { top: 82%; left: 20%; font-size: 1.7rem; transform: rotate(5deg);   }
+    .index-left-deco i:nth-child(7)  { top: 45%; left: 50%; font-size: 1.4rem; transform: rotate(-20deg); }
+    .index-left-deco i:nth-child(8)  { top: 90%; left: 55%; font-size: 2.1rem; transform: rotate(15deg);  }
+
+    .index-left-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        max-width: 380px;
+    }
+
+    .index-logo-icon {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 24px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 28px;
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 3rem;
+        backdrop-filter: blur(4px);
+        border: 2px solid rgba(255,255,255,0.2);
     }
-    h1 { color: white; font-size: 2.2rem; font-weight: 800; }
-    .tagline { color: rgba(255,255,255,0.85); font-size: 1rem; margin-bottom: 50px; }
-    .btn-entrar {
-        background: white;
-        color: #1565C0;
-        font-weight: 700;
-        border-radius: 30px;
-        padding: 14px 0;
+
+    .index-nome {
+        font-family: var(--font-main);
+        font-weight: 900;
+        font-size: 2.8rem;
+        color: var(--branco);
+        letter-spacing: -1px;
+        line-height: 1;
+        margin-bottom: 10px;
+    }
+
+    .index-nome span {
+        color: #FFD54F;
+    }
+
+    .index-tagline {
+        color: rgba(255,255,255,0.80);
+        font-family: var(--font-body);
         font-size: 1rem;
-        width: 100%;
-        border: none;
-        margin-bottom: 12px;
-        display: block;
-        text-align: center;
-        text-decoration: none;
+        line-height: 1.5;
+        margin-bottom: 40px;
     }
-    .btn-entrar:hover { background: #f0f0f0; color: #1565C0; }
-    .btn-criar {
-        background: transparent;
-        color: white;
+
+    .index-livro {
+        font-size: 4rem;
+        opacity: 0.9;
+    }
+
+    /* ---------- PAINEL DIREITO (branco) ---------- */
+    .index-right {
+        width: 420px;
+        min-width: 320px;
+        background: var(--branco);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 40px;
+    }
+
+    .index-card {
+        width: 100%;
+        max-width: 340px;
+        text-align: center;
+    }
+
+    .index-card-title {
+        font-family: var(--font-main);
+        font-weight: 900;
+        font-size: 1.9rem;
+        color: #1a1a2e;
+        margin-bottom: 6px;
+    }
+
+    .index-card-sub {
+        color: var(--cinza-texto);
+        font-size: 0.92rem;
+        margin-bottom: 40px;
+    }
+
+    .index-card-hint {
+        color: #B0B7C3;
+        font-family: var(--font-main);
         font-weight: 700;
-        border-radius: 30px;
-        padding: 14px 0;
-        font-size: 1rem;
-        width: 100%;
-        border: 2px solid white;
-        display: block;
-        text-align: center;
-        text-decoration: none;
+        font-size: 0.78rem;
+        margin-top: 20px;
     }
-    .btn-criar:hover { background: rgba(255,255,255,0.1); color: white; }
-    .logo-icon { font-size: 70px; margin-bottom: 10px; }
+
+    /* ============================================================
+       RESPONSIVO MOBILE
+    ============================================================ */
+    @media (max-width: 768px) {
+        .index-wrapper {
+            flex-direction: column;
+        }
+
+        /* Painel azul vira topo compacto */
+        .index-left {
+            padding: 36px 24px 28px;
+            flex: none;
+        }
+
+        .index-left-deco { display: none; }
+
+        .index-logo-icon {
+            width: 72px;
+            height: 72px;
+            font-size: 2rem;
+            border-radius: 20px;
+            margin-bottom: 14px;
+        }
+
+        .index-nome { font-size: 2rem; }
+        .index-tagline { font-size: 0.88rem; margin-bottom: 0; }
+        .index-livro { display: none; }
+
+        /* Painel branco ocupa o resto */
+        .index-right {
+            width: 100%;
+            min-width: unset;
+            padding: 32px 24px 40px;
+            flex: 1;
+            align-items: flex-start;
+        }
+
+        .index-card { max-width: 100%; }
+        .index-card-title { font-size: 1.5rem; }
+        .index-card-sub { margin-bottom: 28px; }
+    }
+
+    @media (max-width: 480px) {
+        .index-left { padding: 28px 16px 22px; }
+        .index-right { padding: 24px 16px 36px; }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-central text-center">
-    <div class="logo-icon">🎓</div>
-    <h1>SeducUP</h1>
-    <p class="tagline">Plataforma de reconhecimento estudantil</p>
+<div class="index-wrapper">
 
-    <a href="{{ url_for('auth.selecionar_perfil') }}" class="btn-entrar">Entrar</a>
-    <a href="{{ url_for('auth.cadastro_coordenador') }}" class="btn-criar">Criar conta</a>
+    <!-- ======== PAINEL ESQUERDO ======== -->
+    <div class="index-left">
+
+        <!-- Ícones decorativos de fundo -->
+        <div class="index-left-deco">
+            <i class="bi bi-calculator"></i>
+            <i class="bi bi-pencil"></i>
+            <i class="bi bi-globe"></i>
+            <i class="bi bi-book"></i>
+            <i class="bi bi-mortarboard"></i>
+            <i class="bi bi-trophy"></i>
+            <i class="bi bi-star"></i>
+            <i class="bi bi-journal-text"></i>
+        </div>
+
+        <div class="index-left-content">
+            <div class="index-logo-icon">🎓</div>
+
+            <h1 class="index-nome">
+                Seduc<span>Up</span>
+            </h1>
+            <p class="index-tagline">
+                Plataforma de reconhecimento estudantil
+            </p>
+
+            <div class="index-livro">📚</div>
+        </div>
+    </div>
+
+    <!-- ======== PAINEL DIREITO ======== -->
+    <div class="index-right">
+        <div class="index-card">
+            <h2 class="index-card-title">Bem-vindo!</h2>
+            <p class="index-card-sub">Acesse sua conta para continuar</p>
+
+            <a href="{{ url_for('auth.selecionar_perfil') }}"
+               class="btn-primary-seducup mb-3">
+                Entrar
+            </a>
+
+            <a href="{{ url_for('auth.cadastro_coordenador') }}"
+               class="btn-outline-seducup">
+                Criar conta
+            </a>
+
+            <p class="index-card-hint">
+                Aluno faz login pelo RA · Coordenador pela matrícula
+            </p>
+        </div>
+    </div>
+
 </div>
 {% endblock %}
