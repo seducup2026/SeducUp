@@ -1,0 +1,354 @@
+{% extends 'base.html' %}
+{% set layout = 'app' %}
+
+{% block title %}SeducUP — Turmas{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================================
+       CABEÇALHO DA PÁGINA
+    ============================================================ */
+    .turmas-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .btn-nova-turma {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--branco);
+        border: 2px solid var(--azul-claro);
+        color: var(--azul-claro);
+        border-radius: 30px;
+        padding: 9px 20px;
+        font-family: var(--font-main);
+        font-weight: 800;
+        font-size: 0.88rem;
+        text-decoration: none;
+        transition: all 0.18s ease;
+        cursor: pointer;
+    }
+
+    .btn-nova-turma:hover {
+        background: var(--azul-claro);
+        color: var(--branco);
+        box-shadow: 0 4px 12px rgba(43,85,204,0.25);
+    }
+
+    /* ============================================================
+       GRUPOS DE SÉRIE
+    ============================================================ */
+    .serie-grupo {
+        margin-bottom: 28px;
+    }
+
+    .serie-titulo {
+        font-family: var(--font-main);
+        font-weight: 900;
+        font-size: 1.05rem;
+        color: #1a1a2e;
+        margin-bottom: 12px;
+        padding-left: 4px;
+    }
+
+    .turmas-lista {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* ---------- CARD DE TURMA ---------- */
+    .turma-card {
+        background: var(--branco);
+        border-radius: var(--radius-sm);
+        padding: 16px 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        box-shadow: var(--sombra);
+        text-decoration: none;
+        color: #1a1a2e;
+        border: 1.5px solid transparent;
+        transition: all 0.18s ease;
+    }
+
+    .turma-card:hover {
+        border-color: var(--azul-claro);
+        background: #FAFCFF;
+        transform: translateX(4px);
+    }
+
+    .turma-badge {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: var(--azul-claro);
+        color: var(--branco);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-main);
+        font-weight: 900;
+        font-size: 0.78rem;
+        flex-shrink: 0;
+        letter-spacing: -0.5px;
+    }
+
+    .turma-info { flex: 1; }
+
+    .turma-nome {
+        font-family: var(--font-main);
+        font-weight: 800;
+        font-size: 0.95rem;
+        color: #1a1a2e;
+        margin-bottom: 2px;
+    }
+
+    .turma-alunos {
+        font-family: var(--font-main);
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: var(--cinza-texto);
+    }
+
+    .turma-seta {
+        color: #D1D5DB;
+        font-size: 1rem;
+        transition: color 0.18s, transform 0.18s;
+    }
+
+    .turma-card:hover .turma-seta {
+        color: var(--azul-claro);
+        transform: translateX(3px);
+    }
+
+    /* Estado vazio */
+    .turmas-vazio {
+        background: var(--branco);
+        border-radius: var(--radius);
+        padding: 48px 24px;
+        text-align: center;
+        box-shadow: var(--sombra);
+    }
+
+    .turmas-vazio i {
+        font-size: 3rem;
+        color: #D1D5DB;
+        margin-bottom: 16px;
+        display: block;
+    }
+
+    .turmas-vazio p {
+        color: var(--cinza-texto);
+        font-family: var(--font-main);
+        font-weight: 700;
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+    }
+
+    /* ============================================================
+       MODAL — Nova Turma
+    ============================================================ */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        z-index: 500;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    .modal-overlay.aberto { display: flex; }
+
+    .modal-box {
+        background: var(--branco);
+        border-radius: var(--radius);
+        padding: 32px 28px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: var(--sombra-md);
+        animation: modalEntrar 0.2s ease;
+    }
+
+    @keyframes modalEntrar {
+        from { opacity: 0; transform: translateY(-16px) scale(0.97); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-titulo {
+        font-family: var(--font-main);
+        font-weight: 900;
+        font-size: 1.2rem;
+        color: #1a1a2e;
+        margin-bottom: 20px;
+    }
+
+    .modal-form .form-group { margin-bottom: 16px; }
+
+    .modal-acoes {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .btn-cancelar {
+        flex: 1;
+        background: #F3F4F6;
+        color: var(--cinza-texto);
+        border: none;
+        border-radius: 30px;
+        padding: 11px;
+        font-family: var(--font-main);
+        font-weight: 800;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+    .btn-cancelar:hover { background: #E5E7EB; }
+
+    .btn-salvar {
+        flex: 2;
+        background: var(--azul-claro);
+        color: var(--branco);
+        border: none;
+        border-radius: 30px;
+        padding: 11px;
+        font-family: var(--font-main);
+        font-weight: 800;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background 0.18s, box-shadow 0.18s;
+        box-shadow: 0 4px 12px rgba(43,85,204,0.25);
+    }
+
+    .btn-salvar:hover { background: var(--azul); }
+
+    /* ============================================================
+       RESPONSIVO
+    ============================================================ */
+    @media (max-width: 480px) {
+        .turmas-header { flex-direction: column; align-items: flex-start; }
+        .turma-card    { padding: 14px; }
+        .turma-badge   { width: 38px; height: 38px; font-size: 0.72rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- CABEÇALHO -->
+<div class="turmas-header">
+    <div>
+        <h1 class="page-title">Turmas</h1>
+        <p class="page-subtitle">Organize as turmas da sua escola</p>
+    </div>
+    <button class="btn-nova-turma" onclick="abrirModal()">
+        <i class="bi bi-plus-lg"></i> Novas Turmas
+    </button>
+</div>
+
+<!-- FLASH MESSAGES -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-msg flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<!-- LISTA DE TURMAS -->
+{% if turmas_por_serie %}
+    {% for serie, turmas in turmas_por_serie.items() %}
+    <div class="serie-grupo">
+        <div class="serie-titulo">{{ serie }}</div>
+        <div class="turmas-lista">
+            {% for turma in turmas %}
+            <a href="{{ url_for('coordenador.turma_detalhe', turma_id=turma.id) }}"
+               class="turma-card">
+                <div class="turma-badge">{{ turma.nome }}</div>
+                <div class="turma-info">
+                    <div class="turma-nome">Turma {{ turma.nome }}</div>
+                    <div class="turma-alunos">
+                        {{ turma.alunos | length }}
+                        {{ 'aluno' if turma.alunos | length == 1 else 'alunos' }}
+                    </div>
+                </div>
+                <i class="bi bi-chevron-right turma-seta"></i>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+{% else %}
+    <div class="turmas-vazio">
+        <i class="bi bi-people"></i>
+        <p>Nenhuma turma cadastrada ainda.<br>Clique em <strong>Novas Turmas</strong> para começar.</p>
+        <button class="btn-nova-turma" onclick="abrirModal()">
+            <i class="bi bi-plus-lg"></i> Novas Turmas
+        </button>
+    </div>
+{% endif %}
+
+<!-- ============================================================
+     MODAL — Criar nova turma
+============================================================ -->
+<div class="modal-overlay" id="modalNovaTurma">
+    <div class="modal-box">
+        <div class="modal-titulo">Nova Turma</div>
+        <form method="POST" action="{{ url_for('coordenador.nova_turma') }}"
+              class="modal-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group">
+                <label class="form-label">Série:</label>
+                <select name="serie" class="form-control" required>
+                    <option value="" disabled selected>Selecione a série</option>
+                    <option value="1ª Série">1ª Série</option>
+                    <option value="2ª Série">2ª Série</option>
+                    <option value="3ª Série">3ª Série</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Nome da turma:</label>
+                <input type="text" name="nome" class="form-control"
+                       placeholder="Ex: 1ªA, 2ªB, 3ªC" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Ano letivo:</label>
+                <input type="number" name="ano" class="form-control"
+                       placeholder="Ex: 2026" value="2026" required>
+            </div>
+
+            <div class="modal-acoes">
+                <button type="button" class="btn-cancelar"
+                        onclick="fecharModal()">Cancelar</button>
+                <button type="submit" class="btn-salvar">Criar turma</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function abrirModal()  { document.getElementById('modalNovaTurma').classList.add('aberto'); }
+    function fecharModal() { document.getElementById('modalNovaTurma').classList.remove('aberto'); }
+
+    // Fecha ao clicar fora do modal
+    document.getElementById('modalNovaTurma').addEventListener('click', function(e) {
+        if (e.target === this) fecharModal();
+    });
+</script>
+{% endblock %}

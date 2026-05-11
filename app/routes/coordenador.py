@@ -226,3 +226,53 @@ def perfil():
         sidebar_home_url = url_for('coordenador.dashboard'),
         perfil_url       = url_for('coordenador.perfil'),
     )
+
+
+# ----------------------------------------------------------------
+# TURMA — Detalhe (alunos da turma)
+# ----------------------------------------------------------------
+@coordenador.route('/coordenador/turmas/<int:turma_id>')
+@login_required
+@apenas_coordenador
+def turma_detalhe(turma_id):
+    turma = Turma.query.get_or_404(turma_id)
+    alunos = db.session.query(Aluno, Usuario)\
+        .join(Usuario, Aluno.usuario_id == Usuario.id)\
+        .filter(Aluno.turma_id == turma_id)\
+        .order_by(Aluno.pontos.desc()).all()
+
+    return render_template(
+        'coordenador/turma_detalhe.html',
+        sidebar_items    = sidebar_coordenador('turmas'),
+        sidebar_home_url = url_for('coordenador.dashboard'),
+        perfil_url       = url_for('coordenador.perfil'),
+        turma            = turma,
+        alunos           = alunos,
+    )
+
+
+# ----------------------------------------------------------------
+# TURMA — Criar nova turma
+# ----------------------------------------------------------------
+@coordenador.route('/coordenador/turmas/nova', methods=['POST'])
+@login_required
+@apenas_coordenador
+def nova_turma():
+    serie = request.form.get('serie', '').strip()
+    nome  = request.form.get('nome', '').strip().upper()
+    ano   = request.form.get('ano', type=int)
+
+    if not serie or not nome or not ano:
+        flash('Preencha todos os campos.', 'danger')
+        return redirect(url_for('coordenador.turmas'))
+
+    if Turma.query.filter_by(nome=nome, ano=ano).first():
+        flash(f'Turma {nome} já existe para {ano}.', 'danger')
+        return redirect(url_for('coordenador.turmas'))
+
+    t = Turma(nome=nome, serie=serie, ano=ano,
+              coordenador_id=current_user.id)
+    db.session.add(t)
+    db.session.commit()
+    flash(f'Turma {nome} criada com sucesso!', 'success')
+    return redirect(url_for('coordenador.turmas'))
