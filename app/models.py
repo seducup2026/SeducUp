@@ -51,15 +51,54 @@ class Aluno(db.Model):
                                  foreign_keys='Pontuacao.aluno_id')
 
     def atualizar_nivel(self):
-        """Recalcula o nível com base nos pontos totais."""
-        if self.pontos >= 151:
-            self.nivel = 'Protagonista do Saber'
-        elif self.pontos >= 101:
-            self.nivel = 'Destaque de Aprendizagem'
-        elif self.pontos >= 51:
-            self.nivel = 'Aprendiz em Evolução'
-        else:
+        """
+        Recalcula o nível de TODOS os alunos da mesma série
+        com base em posição percentual (calculado por série):
+          Top 20%  → Protagonista do Saber
+          Próx 20% → Destaque de Aprendizagem
+          Próx 35% → Aprendiz em Evolução
+          Últ 25%  → Despertar do Saber
+        Deve ser chamado após salvar pontos e antes do commit.
+        """
+        from app.models import Turma  # import local evita circular
+
+        # Busca todos os alunos da mesma série
+        if not self.turma:
+            # Aluno sem turma: fallback simples
             self.nivel = 'Despertar do Saber'
+            return
+
+        serie = self.turma.serie
+
+        # Todos os alunos da série ordenados por pontos (desc)
+        alunos_serie = (
+            Aluno.query
+            .join(Turma, Aluno.turma_id == Turma.id)
+            .filter(Turma.serie == serie)
+            .order_by(Aluno.pontos.desc())
+            .all()
+        )
+
+        total = len(alunos_serie)
+        if total == 0:
+            self.nivel = 'Despertar do Saber'
+            return
+
+        # Calcula cortes (índices, base 0)
+        corte_protagonista = max(1, round(total * 0.20))
+        corte_destaque     = corte_protagonista + max(1, round(total * 0.20))
+        corte_aprendiz     = corte_destaque     + max(1, round(total * 0.35))
+        # Restante (25%) → Despertar do Saber
+
+        for i, aluno in enumerate(alunos_serie):
+            if i < corte_protagonista:
+                aluno.nivel = 'Protagonista do Saber'
+            elif i < corte_destaque:
+                aluno.nivel = 'Destaque de Aprendizagem'
+            elif i < corte_aprendiz:
+                aluno.nivel = 'Aprendiz em Evolução'
+            else:
+                aluno.nivel = 'Despertar do Saber'
 
 
 class Pontuacao(db.Model):
