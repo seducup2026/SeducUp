@@ -1,61 +1,292 @@
 {% extends 'base.html' %}
 
-{% block title %}SeducUP - Login{% endblock %}
+{% block title %}SeducUP — {% if tipo == 'coordenador' %}Entrar como coordenador{% else %}Entrar como aluno{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .public-layout {
+        background: var(--cinza-bg);
+        padding: 24px 16px;
+    }
+
+    /* ============================================================
+       CONTAINER
+    ============================================================ */
+    .login-wrapper {
+        width: 100%;
+        max-width: 480px;
+        margin: 0 auto;
+    }
+
+    /* ---------- VOLTAR ---------- */
+    .login-voltar {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #9CA3AF;
+        text-decoration: none;
+        font-family: var(--font-main);
+        font-weight: 700;
+        font-size: 0.88rem;
+        margin-bottom: 24px;
+        transition: color 0.15s;
+    }
+
+    .login-voltar:hover { color: var(--azul-claro); }
+
+    /* ---------- CARD ---------- */
+    .login-card {
+        background: var(--branco);
+        border-radius: var(--radius);
+        padding: 36px 32px;
+        box-shadow: var(--sombra);
+    }
+
+    /* ---------- CABEÇALHO ---------- */
+    .login-header {
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .login-logo {
+        font-family: var(--font-main);
+        font-weight: 900;
+        font-size: 1.6rem;
+        color: var(--azul);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+        text-decoration: none;
+    }
+
+    .login-logo-icon {
+        width: 38px;
+        height: 38px;
+        background: var(--azul-claro);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .login-logo .up { color: var(--azul-claro); }
+
+    .login-titulo {
+        font-family: var(--font-main);
+        font-weight: 900;
+        font-size: 1.4rem;
+        color: #1a1a2e;
+        margin-bottom: 0;
+    }
+
+    /* ---------- DICA ---------- */
+    .login-dica {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: var(--radius-sm);
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        font-family: var(--font-main);
+        font-weight: 700;
+        margin-bottom: 22px;
+    }
+
+    .login-dica.azul {
+        background: var(--azul-bg);
+        color: var(--azul-claro);
+    }
+
+    .login-dica.laranja {
+        background: var(--laranja-bg);
+        color: var(--laranja);
+    }
+
+    /* ---------- FORMULÁRIO ---------- */
+    .login-form .form-group {
+        margin-bottom: 18px;
+    }
+
+    .input-icon-wrapper {
+        position: relative;
+    }
+
+    .input-icon-wrapper i {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #B0B7C3;
+        font-size: 1rem;
+        pointer-events: none;
+    }
+
+    .input-icon-wrapper .form-control {
+        padding-left: 36px;
+    }
+
+    /* ---------- LINKS AUXILIARES ---------- */
+    .login-links {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: -8px;
+        margin-bottom: 22px;
+    }
+
+    .login-link {
+        font-family: var(--font-main);
+        font-weight: 700;
+        font-size: 0.82rem;
+        text-decoration: none;
+        transition: opacity 0.15s;
+    }
+
+    .login-link:hover { opacity: 0.75; }
+
+    .login-link.azul  { color: var(--azul-claro); }
+    .login-link.laranja { color: var(--laranja); }
+
+    /* ---------- CRIAR CONTA ---------- */
+    .login-criar {
+        text-align: center;
+        margin-top: 18px;
+    }
+
+    .login-criar a {
+        font-family: var(--font-main);
+        font-weight: 800;
+        font-size: 0.92rem;
+        color: var(--azul-claro);
+        text-decoration: none;
+        transition: opacity 0.15s;
+    }
+
+    .login-criar a:hover { opacity: 0.75; text-decoration: underline; }
+
+    /* ============================================================
+       RESPONSIVO MOBILE
+    ============================================================ */
+    @media (max-width: 520px) {
+        .login-card { padding: 28px 18px; }
+        .login-titulo { font-size: 1.2rem; }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container-central">
-    <div class="card-seducup">
-        <a href="{{ url_for('auth.selecionar_perfil') }}" style="color:#aaa; text-decoration:none;">← Voltar</a>
+<div class="login-wrapper">
 
-        <div class="text-center mt-2 mb-3">
-            <div class="logo-text">🎓 SeducUP</div>
-            <h5 class="fw-bold mt-2">Entrar como {{ tipo|capitalize }}</h5>
+    <!-- VOLTAR -->
+    <a href="{{ url_for('auth.selecionar_perfil') }}" class="login-voltar">
+        <i class="bi bi-chevron-left"></i> Voltar
+    </a>
+
+    <div class="login-card">
+
+        <!-- CABEÇALHO -->
+        <div class="login-header">
+            <a href="{{ url_for('auth.index') }}" class="login-logo">
+                <div class="login-logo-icon">🎓</div>
+                Seduc<span class="up">Up</span>
+            </a>
+            <h1 class="login-titulo">
+                Entrar como {{ 'coordenador' if tipo == 'coordenador' else 'aluno' }}
+            </h1>
         </div>
 
-        {% if tipo == 'aluno' %}
-        <div class="dica-azul">ℹ️ Use seu RA fornecido pela escola</div>
-        {% else %}
-        <div class="dica-azul" style="background:#FFF3E0; color:#E65100;">ℹ️ Use sua matrícula funcional</div>
-        {% endif %}
+        <!-- DICA -->
+        <div class="login-dica {{ 'laranja' if tipo == 'coordenador' else 'azul' }}">
+            <i class="bi bi-info-circle-fill"></i>
+            {% if tipo == 'coordenador' %}
+                Use sua matrícula funcional
+            {% else %}
+                Use seu RA fornecido pela escola
+            {% endif %}
+        </div>
 
+        <!-- FLASH MESSAGES -->
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} py-2">{{ message }}</div>
-            {% endfor %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="flash-msg flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
         {% endwith %}
 
-        <form method="POST">
-            {% if tipo == 'aluno' %}
-            <div class="mb-3">
-                <label class="form-label fw-semibold">RA (Registro do Aluno)</label>
-                <input type="text" name="ra" class="form-control" placeholder="0000000000-X" required>
-            </div>
-            {% else %}
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Matrícula funcional</label>
-                <input type="text" name="matricula" class="form-control" placeholder="Digite sua matrícula" required>
-            </div>
-            {% endif %}
+        <!-- FORMULÁRIO -->
+        <form method="POST" class="login-form">
+            {{ form.hidden_tag() }}
 
-            <div class="mb-2">
-                <label class="form-label fw-semibold">Senha</label>
-                <input type="password" name="senha" class="form-control" placeholder="••••••••" required>
+            <!-- Campo RA ou Matrícula -->
+            <div class="form-group">
+                <label class="form-label">
+                    {{ 'RA' if tipo == 'aluno' else 'Matrícula' }}:
+                </label>
+                <div class="input-icon-wrapper">
+                    <i class="bi bi-person"></i>
+                    {% if tipo == 'coordenador' %}
+                        {{ form.matricula(
+                            class='form-control',
+                            placeholder='0000000000-X'
+                        ) }}
+                    {% else %}
+                        {{ form.ra(
+                            class='form-control',
+                            placeholder='0000000000-X'
+                        ) }}
+                    {% endif %}
+                </div>
             </div>
 
-            <div class="text-end mb-3">
-                <a href="{{ url_for('auth.recuperar_senha') }}" style="color:#1565C0; font-size:0.88rem;">Esqueceu sua senha?</a>
+            <!-- Senha -->
+            <div class="form-group">
+                <label class="form-label">Senha:</label>
+                <div class="input-icon-wrapper">
+                    <i class="bi bi-lock"></i>
+                    {{ form.senha(
+                        class='form-control',
+                        placeholder='Digite sua senha'
+                    ) }}
+                </div>
             </div>
 
-            <button type="submit" class="btn btn-principal">Entrar</button>
+            <!-- Links auxiliares -->
+            <div class="login-links">
+                {% if tipo == 'coordenador' %}
+                    <a href="{{ url_for('auth.login', tipo='aluno') }}"
+                       class="login-link azul">
+                        É aluno? Clique aqui
+                    </a>
+                    <a href="#" class="login-link laranja">
+                        Esqueceu sua senha?
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.login', tipo='coordenador') }}"
+                       class="login-link laranja">
+                        É coordenador? Clique aqui
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- Botão entrar -->
+            <button type="submit" class="btn-primary-seducup">
+                Entrar
+            </button>
+
         </form>
 
-        <div class="text-center mt-3">
-            {% if tipo == 'aluno' %}
-            <p style="color:#aaa; font-size:0.8rem;">🔒 Já cadastrado pela escola</p>
-            {% else %}
-            <a href="{{ url_for('auth.cadastro_coordenador') }}" style="color:#1565C0; font-size:0.9rem;">Não tem conta? Criar conta</a>
-            {% endif %}
+        <!-- Criar conta (só coordenador) -->
+        {% if tipo == 'coordenador' %}
+        <div class="login-criar">
+            <a href="{{ url_for('auth.cadastro_coordenador') }}">
+                Criar conta com a matrícula
+            </a>
         </div>
-    </div>
-</div>
+        {% endif %}
+
+    </div>{# /login-card #}
+</div>{# /login-wrapper #}
 {% endblock %}
