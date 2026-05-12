@@ -1,0 +1,325 @@
+{% extends 'base.html' %}
+{% set layout = 'app' %}
+
+{% block title %}SeducUP — Dados Ordenados{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================================
+       FILTROS
+    ============================================================ */
+    .filtros-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+
+    .filtro-grupo {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .filtro-separador {
+        width: 1px;
+        height: 28px;
+        background: #E5E7EB;
+        margin: 0 4px;
+    }
+
+    .filtro-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 16px;
+        border-radius: 20px;
+        border: 1.5px solid #E5E7EB;
+        background: var(--branco);
+        color: var(--cinza-texto);
+        font-family: var(--font-main);
+        font-weight: 700;
+        font-size: 0.82rem;
+        text-decoration: none;
+        transition: all 0.15s ease;
+        cursor: pointer;
+    }
+
+    .filtro-btn:hover {
+        border-color: var(--azul-claro);
+        color: var(--azul-claro);
+        background: var(--azul-bg);
+    }
+
+    .filtro-btn.ativo {
+        background: var(--azul-claro);
+        border-color: var(--azul-claro);
+        color: var(--branco);
+        box-shadow: 0 2px 8px rgba(43,85,204,0.2);
+    }
+
+    /* ============================================================
+       LISTA DE CLASSIFICAÇÃO
+    ============================================================ */
+    .classificacao-lista {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .classificacao-row {
+        background: var(--branco);
+        border-radius: var(--radius-sm);
+        padding: 13px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: var(--sombra);
+        border: 1.5px solid transparent;
+        transition: border-color 0.15s;
+    }
+
+    .classificacao-row:hover {
+        border-color: #E5E7EB;
+    }
+
+    /* Posição */
+    .class-pos {
+        width: 24px;
+        font-family: var(--font-main);
+        font-weight: 900;
+        font-size: 0.88rem;
+        color: var(--cinza-texto);
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    /* Avatar */
+    .class-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-main);
+        font-weight: 800;
+        font-size: 0.78rem;
+        flex-shrink: 0;
+        color: var(--branco);
+    }
+
+    /* Cores dos avatares por nível */
+    .avatar-protagonista   { background: var(--verde); }
+    .avatar-destaque       { background: var(--azul-claro); }
+    .avatar-aprendiz       { background: #F59E0B; }
+    .avatar-despertar      { background: var(--laranja); }
+
+    /* Info */
+    .class-info { flex: 1; min-width: 0; }
+
+    .class-nome {
+        font-family: var(--font-main);
+        font-weight: 800;
+        font-size: 0.92rem;
+        color: #1a1a2e;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .class-turma {
+        font-family: var(--font-main);
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: var(--cinza-texto);
+    }
+
+    /* Badge nível + pontos */
+    .class-direita {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .class-nivel {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-family: var(--font-main);
+        font-weight: 800;
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
+
+    .nivel-protagonista {
+        background: var(--verde-bg);
+        color: var(--verde);
+        border: 1.5px solid #A7E3BC;
+    }
+
+    .nivel-destaque {
+        background: var(--azul-bg);
+        color: var(--azul-claro);
+        border: 1.5px solid #B8CCFF;
+    }
+
+    .nivel-aprendiz {
+        background: #FFFBE6;
+        color: #B8860B;
+        border: 1.5px solid #FFE082;
+    }
+
+    .nivel-despertar {
+        background: var(--laranja-bg);
+        color: var(--laranja);
+        border: 1.5px solid #FFCC80;
+    }
+
+    .class-pontos {
+        font-family: var(--font-main);
+        font-weight: 900;
+        font-size: 0.88rem;
+        color: var(--azul-claro);
+        min-width: 40px;
+        text-align: right;
+    }
+
+    /* Estado vazio */
+    .dados-vazio {
+        background: var(--branco);
+        border-radius: var(--radius);
+        padding: 48px 24px;
+        text-align: center;
+        box-shadow: var(--sombra);
+    }
+
+    .dados-vazio i {
+        font-size: 2.8rem;
+        color: #D1D5DB;
+        margin-bottom: 12px;
+        display: block;
+    }
+
+    .dados-vazio p {
+        color: var(--cinza-texto);
+        font-family: var(--font-main);
+        font-weight: 700;
+        font-size: 0.92rem;
+    }
+
+    /* ============================================================
+       RESPONSIVO
+    ============================================================ */
+    @media (max-width: 600px) {
+        .filtro-separador { display: none; }
+        .class-nivel { display: none; }
+        .class-pontos { font-size: 0.82rem; }
+        .classificacao-row { padding: 11px 12px; gap: 10px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">Dados ordenados</h1>
+<p class="page-subtitle">Filtre por série e turma</p>
+
+<!-- ======== FILTROS ======== -->
+<div class="filtros-wrapper">
+
+    <!-- Filtro por série -->
+    <div class="filtro-grupo">
+        <a href="{{ url_for('coordenador.dados', serie='todas', turma='todas') }}"
+           class="filtro-btn {% if serie_filtro == 'todas' %}ativo{% endif %}">
+            Todas as séries
+        </a>
+        {% for serie in series %}
+        <a href="{{ url_for('coordenador.dados', serie=serie, turma='todas') }}"
+           class="filtro-btn {% if serie_filtro == serie %}ativo{% endif %}">
+            {{ serie }}
+        </a>
+        {% endfor %}
+    </div>
+
+    {% if serie_filtro != 'todas' and turmas_da_serie %}
+    <div class="filtro-separador"></div>
+
+    <!-- Filtro por turma (aparece só quando série selecionada) -->
+    <div class="filtro-grupo">
+        <a href="{{ url_for('coordenador.dados', serie=serie_filtro, turma='todas') }}"
+           class="filtro-btn {% if turma_filtro == 'todas' %}ativo{% endif %}">
+            Todas turmas
+        </a>
+        {% for t in turmas_da_serie %}
+        <a href="{{ url_for('coordenador.dados', serie=serie_filtro, turma=t.nome) }}"
+           class="filtro-btn {% if turma_filtro == t.nome %}ativo{% endif %}">
+            {{ t.nome }}
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- ======== LISTA ======== -->
+{% if resultados %}
+<div class="classificacao-lista">
+    {% for aluno, usuario, turma in resultados %}
+
+    {% set nivel = aluno.nivel %}
+    {% if nivel == 'Protagonista do Saber' %}
+        {% set avatar_class = 'avatar-protagonista' %}
+        {% set nivel_class  = 'nivel-protagonista' %}
+        {% set nivel_dot    = '🟢' %}
+    {% elif nivel == 'Destaque de Aprendizagem' %}
+        {% set avatar_class = 'avatar-destaque' %}
+        {% set nivel_class  = 'nivel-destaque' %}
+        {% set nivel_dot    = '🔵' %}
+    {% elif nivel == 'Aprendiz em Evolução' %}
+        {% set avatar_class = 'avatar-aprendiz' %}
+        {% set nivel_class  = 'nivel-aprendiz' %}
+        {% set nivel_dot    = '🟡' %}
+    {% else %}
+        {% set avatar_class = 'avatar-despertar' %}
+        {% set nivel_class  = 'nivel-despertar' %}
+        {% set nivel_dot    = '🟠' %}
+    {% endif %}
+
+    <div class="classificacao-row">
+        <div class="class-pos">{{ loop.index }}</div>
+
+        <div class="class-avatar {{ avatar_class }}">
+            {{ usuario.nome[:2].upper() }}
+        </div>
+
+        <div class="class-info">
+            <div class="class-nome">{{ usuario.nome }}</div>
+            <div class="class-turma">
+                {{ turma.serie if turma else '—' }} ·
+                {{ turma.nome  if turma else 'Sem turma' }}
+            </div>
+        </div>
+
+        <div class="class-direita">
+            <div class="class-nivel {{ nivel_class }}">
+                {{ nivel_dot }} {{ nivel }}
+            </div>
+            <div class="class-pontos">{{ aluno.pontos }}</div>
+        </div>
+    </div>
+
+    {% endfor %}
+</div>
+
+{% else %}
+<div class="dados-vazio">
+    <i class="bi bi-bar-chart"></i>
+    <p>Nenhum aluno encontrado para esse filtro.</p>
+</div>
+{% endif %}
+
+{% endblock %}
