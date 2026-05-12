@@ -159,12 +159,22 @@ def lancar_categoria(categoria):
         .order_by(Turma.nome, Usuario.nome)\
         .all()
 
+    labels = {
+        'avaliacao_seduc':      'Avaliação Seduc',
+        'avaliacao_escola':     'Avaliação Escola',
+        'olimpiada':            'Olimpíadas',
+        'miniteste_matematica': 'Miniteste — Matemática',
+        'miniteste_portugues':  'Miniteste — Português',
+        'projeto':              'Projetos',
+    }
+
     return render_template(
         'coordenador/lancar_categoria.html',
         sidebar_items    = sidebar_coordenador('lancar'),
         sidebar_home_url = url_for('coordenador.dashboard'),
         perfil_url       = url_for('coordenador.perfil'),
         categoria        = categoria,
+        categoria_label  = labels.get(categoria, categoria),
         eh_miniteste     = categoria in MINITESTES,
         alunos           = alunos,
     )

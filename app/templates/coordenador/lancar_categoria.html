@@ -1,0 +1,435 @@
+{% extends 'base.html' %}
+{% set layout = 'app' %}
+
+{% block title %}SeducUP — Lançar {{ categoria_label }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .lancar-wrapper { max-width: 720px; }
+
+    .lancar-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .lancar-voltar {
+        color: #9CA3AF;
+        text-decoration: none;
+        font-size: 1.2rem;
+        transition: color 0.15s;
+        display: flex;
+        align-items: center;
+    }
+
+    .lancar-voltar:hover { color: var(--azul-claro); }
+
+    .lancar-titulo-bloco h1 {
+        font-family: var(--font-main);
+        font-weight: 900;
+        font-size: 1.3rem;
+        color: #1a1a2e;
+        margin-bottom: 2px;
+    }
+
+    .lancar-titulo-bloco p {
+        font-size: 0.82rem;
+        color: var(--cinza-texto);
+        font-family: var(--font-main);
+        font-weight: 600;
+    }
+
+    .lancar-card {
+        background: var(--branco);
+        border-radius: var(--radius);
+        padding: 24px;
+        box-shadow: var(--sombra);
+        margin-bottom: 20px;
+    }
+
+    .lancar-card .form-group { margin-bottom: 16px; }
+
+    /* ---------- ALUNOS ---------- */
+    .alunos-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    .alunos-titulo {
+        font-family: var(--font-main);
+        font-weight: 900;
+        font-size: 1rem;
+        color: #1a1a2e;
+    }
+
+    .btn-add-aluno {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--branco);
+        border: 1.5px solid var(--azul-claro);
+        color: var(--azul-claro);
+        border-radius: 20px;
+        padding: 7px 14px;
+        font-family: var(--font-main);
+        font-weight: 800;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .btn-add-aluno:hover { background: var(--azul-claro); color: var(--branco); }
+
+    .alunos-lista { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+
+    .aluno-row {
+        background: #F9FAFB;
+        border: 1.5px solid #E5E7EB;
+        border-radius: var(--radius-sm);
+        padding: 12px 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .aluno-avatar {
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        background: var(--azul-bg);
+        color: var(--azul-claro);
+        display: flex; align-items: center; justify-content: center;
+        font-family: var(--font-main); font-weight: 800; font-size: 0.75rem;
+        flex-shrink: 0;
+    }
+
+    .aluno-nome { flex: 1; font-family: var(--font-main); font-weight: 700; font-size: 0.88rem; color: #1a1a2e; }
+    .aluno-turma { font-size: 0.75rem; color: var(--cinza-texto); font-family: var(--font-main); font-weight: 600; }
+
+    .aluno-acertos { width: 80px; flex-shrink: 0; }
+    .aluno-acertos .form-control { padding: 7px 10px; font-size: 0.88rem; text-align: center; }
+
+    .aluno-remover {
+        background: none; border: none; color: #EF4444;
+        cursor: pointer; font-size: 1rem; padding: 4px;
+        border-radius: 4px; transition: background 0.15s; flex-shrink: 0;
+    }
+    .aluno-remover:hover { background: #FEE2E2; }
+
+    .alunos-vazio {
+        background: #F9FAFB;
+        border: 2px dashed #E5E7EB;
+        border-radius: var(--radius-sm);
+        padding: 28px; text-align: center;
+        color: var(--cinza-texto);
+        font-family: var(--font-main); font-weight: 700; font-size: 0.88rem;
+        margin-bottom: 12px;
+    }
+
+    .alunos-vazio strong { color: var(--azul-claro); }
+
+    /* ---------- RODAPÉ ---------- */
+    .lancar-footer {
+        background: var(--branco);
+        border-radius: var(--radius);
+        padding: 18px 24px;
+        box-shadow: var(--sombra);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .total-lancar {
+        font-family: var(--font-main); font-weight: 700;
+        font-size: 0.88rem; color: var(--cinza-texto);
+    }
+
+    .total-lancar span { font-weight: 900; font-size: 1rem; color: var(--azul-claro); }
+
+    /* ============================================================
+       MODAL
+    ============================================================ */
+    .modal-overlay {
+        display: none; position: fixed; inset: 0;
+        background: rgba(0,0,0,0.45); z-index: 500;
+        align-items: center; justify-content: center; padding: 16px;
+    }
+
+    .modal-overlay.aberto { display: flex; }
+
+    .modal-box {
+        background: var(--branco); border-radius: var(--radius);
+        padding: 28px 24px; width: 100%; max-width: 500px;
+        max-height: 80vh; display: flex; flex-direction: column;
+        box-shadow: var(--sombra-md);
+        animation: modalEntrar 0.2s ease;
+    }
+
+    @keyframes modalEntrar {
+        from { opacity: 0; transform: translateY(-16px) scale(0.97); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-titulo { font-family: var(--font-main); font-weight: 900; font-size: 1.1rem; color: #1a1a2e; margin-bottom: 14px; flex-shrink: 0; }
+
+    .modal-busca { margin-bottom: 12px; flex-shrink: 0; position: relative; }
+    .modal-busca i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #B0B7C3; }
+    .modal-busca input { padding-left: 34px; }
+
+    .modal-lista { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+
+    .modal-aluno-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 10px 12px; border-radius: var(--radius-sm);
+        cursor: pointer; transition: background 0.15s;
+        border: 1.5px solid transparent;
+    }
+
+    .modal-aluno-item:hover { background: var(--azul-bg); border-color: #D0E4FF; }
+    .modal-aluno-item.selecionado { background: var(--azul-bg); border-color: var(--azul-claro); }
+
+    .modal-aluno-avatar {
+        width: 34px; height: 34px; border-radius: 50%;
+        background: var(--azul-bg); color: var(--azul-claro);
+        display: flex; align-items: center; justify-content: center;
+        font-family: var(--font-main); font-weight: 800; font-size: 0.72rem; flex-shrink: 0;
+    }
+
+    .modal-aluno-info { flex: 1; }
+    .modal-aluno-nome { font-family: var(--font-main); font-weight: 700; font-size: 0.88rem; color: #1a1a2e; }
+    .modal-aluno-turma { font-size: 0.75rem; color: var(--cinza-texto); font-family: var(--font-main); font-weight: 600; }
+
+    .modal-check { color: var(--azul-claro); font-size: 1.1rem; display: none; }
+    .modal-aluno-item.selecionado .modal-check { display: block; }
+
+    .modal-acoes { display: flex; gap: 10px; margin-top: 14px; flex-shrink: 0; }
+
+    .btn-cancelar {
+        flex: 1; background: #F3F4F6; color: var(--cinza-texto);
+        border: none; border-radius: 30px; padding: 11px;
+        font-family: var(--font-main); font-weight: 800; font-size: 0.9rem;
+        cursor: pointer; transition: background 0.15s;
+    }
+    .btn-cancelar:hover { background: #E5E7EB; }
+
+    .btn-confirmar-modal {
+        flex: 2; background: var(--azul-claro); color: var(--branco);
+        border: none; border-radius: 30px; padding: 11px;
+        font-family: var(--font-main); font-weight: 800; font-size: 0.9rem;
+        cursor: pointer; transition: background 0.18s;
+        box-shadow: 0 4px 12px rgba(43,85,204,0.25);
+    }
+    .btn-confirmar-modal:hover { background: var(--azul); }
+
+    @media (max-width: 480px) {
+        .lancar-footer { flex-direction: column; align-items: stretch; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lancar-wrapper">
+
+    <div class="lancar-header">
+        <a href="{{ url_for('coordenador.lancar') }}" class="lancar-voltar">
+            <i class="bi bi-chevron-left"></i>
+        </a>
+        <div class="lancar-titulo-bloco">
+            <h1>{{ categoria_label }}</h1>
+            <p>Cadastre a avaliação e adicione os alunos</p>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, message in messages %}
+        <div class="flash-msg flash-{{ category }}">{{ message }}</div>
+        {% endfor %}{% endif %}
+    {% endwith %}
+
+    <form method="POST" id="formLancar">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="lancar-card">
+            {% if not eh_miniteste %}
+            <div class="form-group">
+                <label class="form-label">
+                    {% if categoria == 'olimpiada' %}Nome da olimpíada:
+                    {% elif categoria == 'projeto' %}Nome do projeto:
+                    {% else %}Nome da avaliação:{% endif %}
+                </label>
+                <input type="text" name="nome_avaliacao" class="form-control"
+                    placeholder="{% if categoria == 'olimpiada' %}Ex: Olimpíada Brasileira de Geografia{% elif categoria == 'projeto' %}Ex: Feira de Profissões{% else %}Ex: Simula+{% endif %}"
+                    required>
+            </div>
+            {% endif %}
+
+            <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Total de questões:</label>
+                <input type="number" name="total_questoes" id="totalQuestoes"
+                       class="form-control" min="1"
+                       placeholder="{% if 'miniteste' in categoria %}12{% elif categoria == 'olimpiada' %}20{% elif categoria == 'avaliacao_seduc' %}52{% else %}65{% endif %}"
+                       required>
+            </div>
+        </div>
+
+        <div class="lancar-card">
+            <div class="alunos-header">
+                <div class="alunos-titulo">Alunos (<span id="countAlunos">0</span>)</div>
+                <button type="button" class="btn-add-aluno" onclick="abrirModal()">
+                    <i class="bi bi-plus-lg"></i> Adicionar aluno
+                </button>
+            </div>
+
+            <div class="alunos-lista" id="alunosLista"></div>
+
+            <div class="alunos-vazio" id="alunosVazio">
+                Nenhum aluno adicionado.<br>
+                Clique em <strong>adicionar aluno</strong> para continuar.
+            </div>
+        </div>
+
+        <div class="lancar-footer">
+            <div class="total-lancar">
+                Total a lançar &nbsp;<span id="totalPontos">0pts</span>
+            </div>
+            <button type="submit" class="btn-primary-seducup"
+                    style="width:auto; padding: 12px 32px;">
+                Confirmar lançamento
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalAlunos">
+    <div class="modal-box">
+        <div class="modal-titulo">Selecionar alunos</div>
+        <div class="modal-busca">
+            <i class="bi bi-search"></i>
+            <input type="text" class="form-control" id="buscaAluno"
+                   placeholder="Buscar por nome ou turma..."
+                   oninput="filtrarAlunos()">
+        </div>
+        <div class="modal-lista" id="modalLista">
+            {% for aluno, usuario, turma in alunos %}
+            <div class="modal-aluno-item"
+                 data-id="{{ aluno.id }}"
+                 data-nome="{{ usuario.nome }}"
+                 data-turma="{{ turma.nome if turma else 'Sem turma' }}"
+                 onclick="toggleAluno(this)">
+                <div class="modal-aluno-avatar">{{ usuario.nome[:2].upper() }}</div>
+                <div class="modal-aluno-info">
+                    <div class="modal-aluno-nome">{{ usuario.nome }}</div>
+                    <div class="modal-aluno-turma">{{ turma.nome if turma else 'Sem turma' }}</div>
+                </div>
+                <i class="bi bi-check-circle-fill modal-check"></i>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="modal-acoes">
+            <button type="button" class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+            <button type="button" class="btn-confirmar-modal" onclick="confirmarSelecao()">Confirmar seleção</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let selecionados = {};
+
+    function abrirModal() {
+        document.getElementById('modalAlunos').classList.add('aberto');
+        document.getElementById('buscaAluno').value = '';
+        filtrarAlunos();
+    }
+
+    function fecharModal() {
+        document.getElementById('modalAlunos').classList.remove('aberto');
+    }
+
+    document.getElementById('modalAlunos').addEventListener('click', function(e) {
+        if (e.target === this) fecharModal();
+    });
+
+    function toggleAluno(el) {
+        const id = el.dataset.id;
+        if (selecionados[id]) {
+            delete selecionados[id];
+            el.classList.remove('selecionado');
+        } else {
+            selecionados[id] = { nome: el.dataset.nome, turma: el.dataset.turma };
+            el.classList.add('selecionado');
+        }
+    }
+
+    function filtrarAlunos() {
+        const busca = document.getElementById('buscaAluno').value.toLowerCase();
+        document.querySelectorAll('.modal-aluno-item').forEach(item => {
+            const match = item.dataset.nome.toLowerCase().includes(busca) ||
+                          item.dataset.turma.toLowerCase().includes(busca);
+            item.style.display = match ? '' : 'none';
+        });
+    }
+
+    function confirmarSelecao() {
+        fecharModal();
+        renderizarAlunos();
+    }
+
+    function renderizarAlunos() {
+        const lista = document.getElementById('alunosLista');
+        const vazio = document.getElementById('alunosVazio');
+        const count = document.getElementById('countAlunos');
+        const ids   = Object.keys(selecionados);
+
+        lista.innerHTML = '';
+        count.textContent = ids.length;
+        vazio.style.display = ids.length === 0 ? '' : 'none';
+
+        ids.forEach(id => {
+            const { nome, turma } = selecionados[id];
+            const row = document.createElement('div');
+            row.className = 'aluno-row';
+            row.innerHTML = `
+                <div class="aluno-avatar">${nome.substring(0,2).toUpperCase()}</div>
+                <div class="aluno-nome">${nome}<div class="aluno-turma">${turma}</div></div>
+                <div class="aluno-acertos">
+                    <input type="number" name="acertos" class="form-control"
+                           min="0" placeholder="Acertos" oninput="calcularTotal()">
+                    <input type="hidden" name="aluno_ids" value="${id}">
+                </div>
+                <button type="button" class="aluno-remover" onclick="removerAluno('${id}')">
+                    <i class="bi bi-x-lg"></i>
+                </button>`;
+            lista.appendChild(row);
+        });
+
+        calcularTotal();
+    }
+
+    function removerAluno(id) {
+        delete selecionados[id];
+        const item = document.querySelector(`.modal-aluno-item[data-id="${id}"]`);
+        if (item) item.classList.remove('selecionado');
+        renderizarAlunos();
+    }
+
+    function calcularTotal() {
+        const total  = parseInt(document.getElementById('totalQuestoes').value) || 0;
+        let totalPts = 0;
+        document.querySelectorAll('input[name="acertos"]').forEach(input => {
+            const acertos = parseInt(input.value) || 0;
+            if (total > 0) totalPts += Math.round((acertos / total) * 100);
+        });
+        document.getElementById('totalPontos').textContent = totalPts + 'pts';
+    }
+
+    document.getElementById('totalQuestoes').addEventListener('input', calcularTotal);
+</script>
+{% endblock %}
