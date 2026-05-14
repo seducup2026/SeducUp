@@ -1,0 +1,399 @@
+{% extends 'base.html' %}
+{% set layout = 'app' %}
+
+{% block title %}SeducUP — Início{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        align-items: start;
+    }
+
+    /* ============================================================
+       CARD PONTUAÇÃO (verde)
+    ============================================================ */
+    .card-pontuacao {
+        background: linear-gradient(135deg, #1B8C3E 0%, #27AE60 100%);
+        border-radius: var(--radius);
+        padding: 28px 24px;
+        color: var(--branco);
+        box-shadow: 0 6px 24px rgba(27,140,62,0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-pontuacao::before {
+        content: '';
+        position: absolute;
+        top: -30px; right: -30px;
+        width: 140px; height: 140px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+    }
+
+    .card-pontuacao::after {
+        content: '';
+        position: absolute;
+        bottom: -20px; right: 20px;
+        width: 90px; height: 90px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.06);
+    }
+
+    .pontuacao-label {
+        font-family: var(--font-main);
+        font-weight: 700;
+        font-size: 0.85rem;
+        opacity: 0.85;
+        margin-bottom: 8px;
+    }
+
+    .pontuacao-valor {
+        font-family: var(--font-main);
+        font-weight: 900;
+        font-size: 2.8rem;
+        line-height: 1;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .pontuacao-valor span {
+        font-size: 1.4rem;
+        font-weight: 700;
+        opacity: 0.85;
+    }
+
+    .pontuacao-icone {
+        position: absolute;
+        top: 20px; right: 24px;
+        font-size: 3.5rem;
+        opacity: 0.25;
+    }
+
+    .nivel-badge-verde {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255,255,255,0.18);
+        border: 1.5px solid rgba(255,255,255,0.3);
+        border-radius: 20px;
+        padding: 6px 14px;
+        font-family: var(--font-main);
+        font-weight: 800;
+        font-size: 0.82rem;
+        color: var(--branco);
+        backdrop-filter: blur(4px);
+    }
+
+    /* ============================================================
+       CARD CLASSIFICAÇÃO DE APRENDIZAGEM
+    ============================================================ */
+    .card-classificacao {
+        background: var(--branco);
+        border-radius: var(--radius);
+        padding: 22px;
+        box-shadow: var(--sombra);
+    }
+
+    .card-classificacao-titulo {
+        font-family: var(--font-main);
+        font-weight: 900;
+        font-size: 0.95rem;
+        color: #1a1a2e;
+        margin-bottom: 18px;
+    }
+
+    .niveis-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .nivel-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        text-align: center;
+    }
+
+    .nivel-circulo {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .nivel-circulo.despertar   { background: var(--laranja); }
+    .nivel-circulo.aprendiz    { background: #F59E0B; }
+    .nivel-circulo.destaque    { background: var(--azul-claro); }
+    .nivel-circulo.protagonista{ background: var(--verde); }
+
+    .nivel-item-label {
+        font-family: var(--font-main);
+        font-weight: 700;
+        font-size: 0.72rem;
+        color: var(--cinza-texto);
+        line-height: 1.3;
+    }
+
+    .nivel-item.ativo .nivel-item-label {
+        color: #1a1a2e;
+        font-weight: 800;
+    }
+
+    .nivel-item.ativo .nivel-circulo {
+        box-shadow: 0 0 0 4px rgba(0,0,0,0.08);
+        transform: scale(1.15);
+    }
+
+    /* ============================================================
+       CARD HISTÓRICO
+    ============================================================ */
+    .card-historico {
+        background: var(--branco);
+        border-radius: var(--radius);
+        padding: 22px;
+        box-shadow: var(--sombra);
+        grid-column: 2;
+        grid-row: 1 / 3;
+    }
+
+    .historico-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .historico-titulo {
+        font-family: var(--font-main);
+        font-weight: 900;
+        font-size: 0.95rem;
+        color: #1a1a2e;
+    }
+
+    .historico-filtros {
+        display: flex;
+        gap: 6px;
+    }
+
+    .hist-filtro {
+        padding: 4px 12px;
+        border-radius: 14px;
+        border: 1.5px solid #E5E7EB;
+        background: var(--branco);
+        color: var(--cinza-texto);
+        font-family: var(--font-main);
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-decoration: none;
+        transition: all 0.15s;
+        cursor: pointer;
+    }
+
+    .hist-filtro:hover,
+    .hist-filtro.ativo {
+        background: var(--azul-claro);
+        border-color: var(--azul-claro);
+        color: var(--branco);
+    }
+
+    /* Lista de histórico */
+    .historico-lista {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    .historico-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #F3F4F6;
+        position: relative;
+    }
+
+    .historico-item:last-child { border-bottom: none; }
+
+    .hist-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--azul-claro);
+        flex-shrink: 0;
+        border: 2px solid var(--branco);
+        box-shadow: 0 0 0 2px var(--azul-claro);
+    }
+
+    .hist-nome {
+        flex: 1;
+        font-family: var(--font-main);
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: #1a1a2e;
+    }
+
+    .hist-data {
+        font-size: 0.72rem;
+        color: #9CA3AF;
+        font-family: var(--font-main);
+        font-weight: 600;
+    }
+
+    .hist-pontos {
+        background: var(--azul-bg);
+        color: var(--azul-claro);
+        border: 1.5px solid #B8CCFF;
+        border-radius: 8px;
+        padding: 4px 10px;
+        font-family: var(--font-main);
+        font-weight: 900;
+        font-size: 0.82rem;
+        white-space: nowrap;
+    }
+
+    /* Vazio */
+    .historico-vazio {
+        text-align: center;
+        padding: 32px 16px;
+        color: var(--cinza-texto);
+        font-family: var(--font-main);
+        font-weight: 700;
+        font-size: 0.88rem;
+    }
+
+    .historico-vazio i {
+        font-size: 2rem;
+        color: #D1D5DB;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    /* ============================================================
+       RESPONSIVO
+    ============================================================ */
+    @media (max-width: 768px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .card-historico {
+            grid-column: 1;
+            grid-row: auto;
+        }
+
+        .pontuacao-valor { font-size: 2.2rem; }
+    }
+
+    @media (max-width: 400px) {
+        .niveis-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .nivel-circulo { width: 28px; height: 28px; }
+        .nivel-item-label { font-size: 0.65rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-grid">
+
+    <!-- ======== COLUNA ESQUERDA ======== -->
+
+    <!-- CARD PONTUAÇÃO -->
+    <div class="card-pontuacao">
+        <i class="bi bi-award pontuacao-icone"></i>
+        <div class="pontuacao-label">Pontuação Total</div>
+        <div class="pontuacao-valor">
+            {{ aluno.pontos }}<span>pts</span>
+        </div>
+        <div class="nivel-badge-verde">
+            ⭐ Nível: {{ aluno.nivel }}
+        </div>
+    </div>
+
+    <!-- CARD HISTÓRICO (ocupa 2 linhas no desktop) -->
+    <div class="card-historico">
+        <div class="historico-header">
+            <div class="historico-titulo">Histórico de pontos</div>
+            <div class="historico-filtros">
+                <a href="?filtro=todos"
+                   class="hist-filtro {% if filtro == 'todos' or not filtro %}ativo{% endif %}">
+                    Todos
+                </a>
+                <a href="?filtro=provas"
+                   class="hist-filtro {% if filtro == 'provas' %}ativo{% endif %}">
+                    Provas
+                </a>
+                <a href="?filtro=olimpiadas"
+                   class="hist-filtro {% if filtro == 'olimpiadas' %}ativo{% endif %}">
+                    Olimpíadas
+                </a>
+            </div>
+        </div>
+
+        {% if historico %}
+        <div class="historico-lista">
+            {% for p in historico %}
+            <div class="historico-item">
+                <div class="hist-dot"></div>
+                <div class="hist-nome">
+                    {{ p.categoria_label }}
+                    {% if p.nome_avaliacao %}
+                    — {{ p.nome_avaliacao }}
+                    {% endif %}
+                    <div class="hist-data">
+                        {{ p.data.strftime('%d/%m/%Y') }}
+                    </div>
+                </div>
+                <div class="hist-pontos">+{{ p.valor }}pts</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="historico-vazio">
+            <i class="bi bi-clock-history"></i>
+            Nenhuma pontuação registrada ainda.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- CARD CLASSIFICAÇÃO DE APRENDIZAGEM -->
+    <div class="card-classificacao">
+        <div class="card-classificacao-titulo">Classificação de Aprendizagem</div>
+        <div class="niveis-grid">
+
+            {% set nivel_atual = aluno.nivel %}
+
+            <div class="nivel-item {% if nivel_atual == 'Despertar do Saber' %}ativo{% endif %}">
+                <div class="nivel-circulo despertar"></div>
+                <div class="nivel-item-label">Despertar do Saber</div>
+            </div>
+
+            <div class="nivel-item {% if nivel_atual == 'Aprendiz em Evolução' %}ativo{% endif %}">
+                <div class="nivel-circulo aprendiz"></div>
+                <div class="nivel-item-label">Aprendiz em Evolução</div>
+            </div>
+
+            <div class="nivel-item {% if nivel_atual == 'Destaque de Aprendizagem' %}ativo{% endif %}">
+                <div class="nivel-circulo destaque"></div>
+                <div class="nivel-item-label">Destaque de Aprendizagem</div>
+            </div>
+
+            <div class="nivel-item {% if nivel_atual == 'Protagonista do Saber' %}ativo{% endif %}">
+                <div class="nivel-circulo protagonista"></div>
+                <div class="nivel-item-label">Protagonista do Saber</div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
