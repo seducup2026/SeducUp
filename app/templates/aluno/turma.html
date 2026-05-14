@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% set layout = 'app' %}
+
+{% block title %}SeducUP — Turma{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================================
+       CABEÇALHO
+    ============================================================ */
+    .turma-page-header {
+        margin-bottom: 24px;
+    }
+
+    .turma-page-titulo {
+        font-family: var(--font-main);
+        font-weight: 900;
+        font-size: 1.5rem;
+        color: #1a1a2e;
+        margin-bottom: 4px;
+    }
+
+    .turma-page-sub {
+        color: var(--cinza-texto);
+        font-family: var(--font-main);
+        font-weight: 600;
+        font-size: 0.88rem;
+    }
+
+    /* ============================================================
+       ABAS DE TURMA
+    ============================================================ */
+    .turmas-abas {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .turma-aba {
+        padding: 8px 20px;
+        border-radius: 20px;
+        border: 1.5px solid #E5E7EB;
+        background: var(--branco);
+        color: var(--cinza-texto);
+        font-family: var(--font-main);
+        font-weight: 800;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+
+    .turma-aba:hover {
+        border-color: var(--azul-claro);
+        color: var(--azul-claro);
+        background: var(--azul-bg);
+    }
+
+    .turma-aba.ativa {
+        background: var(--azul-claro);
+        border-color: var(--azul-claro);
+        color: var(--branco);
+        box-shadow: 0 2px 8px rgba(43,85,204,0.25);
+    }
+
+    /* ============================================================
+       LISTA DE CLASSIFICAÇÃO
+    ============================================================ */
+    .turma-lista {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .turma-aluno-row {
+        background: var(--branco);
+        border-radius: var(--radius-sm);
+        padding: 13px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: var(--sombra);
+        border: 1.5px solid transparent;
+        transition: border-color 0.15s;
+    }
+
+    /* Destaque para o aluno logado */
+    .turma-aluno-row.eu {
+        border-color: var(--azul-claro);
+        background: #FAFCFF;
+    }
+
+    /* Avatar */
+    .turma-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-main);
+        font-weight: 800;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+        color: var(--branco);
+    }
+
+    .avatar-protagonista  { background: var(--verde); }
+    .avatar-destaque      { background: var(--azul-claro); }
+    .avatar-aprendiz      { background: #F59E0B; }
+    .avatar-despertar     { background: var(--laranja); }
+
+    /* Info */
+    .turma-aluno-info { flex: 1; min-width: 0; }
+
+    .turma-aluno-nome {
+        font-family: var(--font-main);
+        font-weight: 800;
+        font-size: 0.92rem;
+        color: #1a1a2e;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .turma-aluno-nome .eu-label {
+        font-size: 0.72rem;
+        color: var(--azul-claro);
+        font-weight: 700;
+        margin-left: 6px;
+    }
+
+    /* Badge nível */
+    .turma-nivel {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-family: var(--font-main);
+        font-weight: 800;
+        font-size: 0.78rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .nivel-protagonista {
+        background: var(--verde-bg);
+        color: var(--verde);
+        border: 1.5px solid #A7E3BC;
+    }
+
+    .nivel-destaque {
+        background: var(--azul-bg);
+        color: var(--azul-claro);
+        border: 1.5px solid #B8CCFF;
+    }
+
+    .nivel-aprendiz {
+        background: #FFFBE6;
+        color: #B8860B;
+        border: 1.5px solid #FFE082;
+    }
+
+    .nivel-despertar {
+        background: var(--laranja-bg);
+        color: var(--laranja);
+        border: 1.5px solid #FFCC80;
+    }
+
+    /* Estado vazio */
+    .turma-vazio {
+        background: var(--branco);
+        border-radius: var(--radius);
+        padding: 48px 24px;
+        text-align: center;
+        box-shadow: var(--sombra);
+    }
+
+    .turma-vazio i {
+        font-size: 2.8rem;
+        color: #D1D5DB;
+        margin-bottom: 12px;
+        display: block;
+    }
+
+    .turma-vazio p {
+        color: var(--cinza-texto);
+        font-family: var(--font-main);
+        font-weight: 700;
+        font-size: 0.92rem;
+    }
+
+    /* ============================================================
+       RESPONSIVO
+    ============================================================ */
+    @media (max-width: 480px) {
+        .turma-nivel { display: none; }
+        .turma-aluno-row { padding: 11px 12px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- CABEÇALHO -->
+<div class="turma-page-header">
+    <h1 class="turma-page-titulo">
+        Classificação de desempenho
+        {% if serie %} — {{ serie }}{% endif %}
+    </h1>
+    {% if turmas_serie %}
+    <p class="turma-page-sub">
+        Suas turmas:
+        {% for t in turmas_serie %}
+            {{ t.nome }}{% if not loop.last %}, {% endif %}
+        {% endfor %}
+    </p>
+    {% endif %}
+</div>
+
+<!-- ABAS DE TURMA -->
+{% if turmas_serie %}
+<div class="turmas-abas">
+    {% for t in turmas_serie %}
+    <a href="{{ url_for('aluno.turma', turma=t.nome) }}"
+       class="turma-aba {% if turma_selecionada and turma_selecionada.nome == t.nome %}ativa{% endif %}">
+        {{ t.nome }}
+    </a>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- LISTA -->
+{% if alunos %}
+<div class="turma-lista">
+    {% for aluno_item, usuario in alunos %}
+
+    {% set nivel = aluno_item.nivel %}
+    {% if nivel == 'Protagonista do Saber' %}
+        {% set avatar_class = 'avatar-protagonista' %}
+        {% set nivel_class  = 'nivel-protagonista' %}
+    {% elif nivel == 'Destaque de Aprendizagem' %}
+        {% set avatar_class = 'avatar-destaque' %}
+        {% set nivel_class  = 'nivel-destaque' %}
+    {% elif nivel == 'Aprendiz em Evolução' %}
+        {% set avatar_class = 'avatar-aprendiz' %}
+        {% set nivel_class  = 'nivel-aprendiz' %}
+    {% else %}
+        {% set avatar_class = 'avatar-despertar' %}
+        {% set nivel_class  = 'nivel-despertar' %}
+    {% endif %}
+
+    {% set eh_eu = aluno_item.id == aluno_atual_id %}
+
+    <div class="turma-aluno-row {% if eh_eu %}eu{% endif %}">
+
+        <div class="turma-avatar {{ avatar_class }}">
+            {{ usuario.nome[:2].upper() }}
+        </div>
+
+        <div class="turma-aluno-info">
+            <div class="turma-aluno-nome">
+                {{ usuario.nome }}
+                {% if eh_eu %}
+                <span class="eu-label">• você</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="turma-nivel {{ nivel_class }}">
+            {{ nivel }}
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+
+{% elif turma_selecionada %}
+<div class="turma-vazio">
+    <i class="bi bi-people"></i>
+    <p>Nenhum aluno nesta turma ainda.</p>
+</div>
+
+{% else %}
+<div class="turma-vazio">
+    <i class="bi bi-mortarboard"></i>
+    <p>Você ainda não está vinculado a uma turma.<br>Fale com seu coordenador.</p>
+</div>
+{% endif %}
+
+{% endblock %}
