@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% set layout = 'app' %}
+
+{% block title %}SeducUP — Turma {{ turma.nome }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detalhe-wrapper { max-width: 680px; }
+
+    .detalhe-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .detalhe-voltar {
+        color: #9CA3AF;
+        text-decoration: none;
+        font-size: 1.2rem;
+        transition: color 0.15s;
+        display: flex;
+        align-items: center;
+    }
+
+    .detalhe-voltar:hover { color: var(--azul-claro); }
+
+    .detalhe-badge {
+        width: 48px; height: 48px;
+        border-radius: 12px;
+        background: var(--azul-claro);
+        color: var(--branco);
+        display: flex; align-items: center; justify-content: center;
+        font-family: var(--font-main); font-weight: 900; font-size: 0.85rem;
+    }
+
+    .detalhe-info h1 {
+        font-family: var(--font-main);
+        font-weight: 900; font-size: 1.3rem; color: #1a1a2e; margin-bottom: 2px;
+    }
+
+    .detalhe-info p {
+        font-size: 0.82rem; color: var(--cinza-texto);
+        font-family: var(--font-main); font-weight: 600;
+    }
+
+    /* Lista de alunos */
+    .alunos-lista { display: flex; flex-direction: column; gap: 8px; }
+
+    .aluno-card {
+        background: var(--branco);
+        border-radius: var(--radius-sm);
+        padding: 13px 16px;
+        display: flex; align-items: center; gap: 12px;
+        box-shadow: var(--sombra);
+        border: 1.5px solid transparent;
+        transition: border-color 0.15s;
+    }
+
+    .aluno-card:hover { border-color: #E5E7EB; }
+
+    .aluno-avatar {
+        width: 40px; height: 40px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-family: var(--font-main); font-weight: 800; font-size: 0.8rem;
+        flex-shrink: 0; color: var(--branco);
+    }
+
+    .avatar-protagonista  { background: var(--verde); }
+    .avatar-destaque      { background: var(--azul-claro); }
+    .avatar-aprendiz      { background: #F59E0B; }
+    .avatar-despertar     { background: var(--laranja); }
+
+    .aluno-info { flex: 1; }
+    .aluno-nome { font-family: var(--font-main); font-weight: 800; font-size: 0.92rem; color: #1a1a2e; }
+    .aluno-pts  { font-size: 0.75rem; color: var(--cinza-texto); font-family: var(--font-main); font-weight: 600; }
+
+    .aluno-nivel {
+        display: inline-flex; align-items: center;
+        padding: 5px 12px; border-radius: 20px;
+        font-family: var(--font-main); font-weight: 800; font-size: 0.75rem;
+        white-space: nowrap; flex-shrink: 0;
+    }
+
+    .nivel-protagonista { background: var(--verde-bg); color: var(--verde); border: 1.5px solid #A7E3BC; }
+    .nivel-destaque     { background: var(--azul-bg);  color: var(--azul-claro); border: 1.5px solid #B8CCFF; }
+    .nivel-aprendiz     { background: #FFFBE6; color: #B8860B; border: 1.5px solid #FFE082; }
+    .nivel-despertar    { background: var(--laranja-bg); color: var(--laranja); border: 1.5px solid #FFCC80; }
+
+    .turma-vazio {
+        background: var(--branco); border-radius: var(--radius);
+        padding: 48px 24px; text-align: center; box-shadow: var(--sombra);
+    }
+    .turma-vazio i { font-size: 2.8rem; color: #D1D5DB; margin-bottom: 12px; display: block; }
+    .turma-vazio p { color: var(--cinza-texto); font-family: var(--font-main); font-weight: 700; font-size: 0.92rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detalhe-wrapper">
+
+    <div class="detalhe-header">
+        <a href="{{ url_for('coordenador.turmas') }}" class="detalhe-voltar">
+            <i class="bi bi-chevron-left"></i>
+        </a>
+        <div class="detalhe-badge">{{ turma.nome }}</div>
+        <div class="detalhe-info">
+            <h1>Turma {{ turma.nome }}</h1>
+            <p>{{ turma.serie }} · {{ alunos | length }} aluno{{ 's' if alunos | length != 1 }}</p>
+        </div>
+    </div>
+
+    {% if alunos %}
+    <div class="alunos-lista">
+        {% for aluno, usuario in alunos %}
+
+        {% set nivel = aluno.nivel %}
+        {% if nivel == 'Protagonista do Saber' %}
+            {% set avatar_class = 'avatar-protagonista' %}
+            {% set nivel_class  = 'nivel-protagonista' %}
+        {% elif nivel == 'Destaque de Aprendizagem' %}
+            {% set avatar_class = 'avatar-destaque' %}
+            {% set nivel_class  = 'nivel-destaque' %}
+        {% elif nivel == 'Aprendiz em Evolução' %}
+            {% set avatar_class = 'avatar-aprendiz' %}
+            {% set nivel_class  = 'nivel-aprendiz' %}
+        {% else %}
+            {% set avatar_class = 'avatar-despertar' %}
+            {% set nivel_class  = 'nivel-despertar' %}
+        {% endif %}
+
+        <div class="aluno-card">
+            <div class="aluno-avatar {{ avatar_class }}">
+                {{ usuario.nome[:2].upper() }}
+            </div>
+            <div class="aluno-info">
+                <div class="aluno-nome">{{ usuario.nome }}</div>
+                <div class="aluno-pts">{{ aluno.pontos }} pontos</div>
+            </div>
+            <div class="aluno-nivel {{ nivel_class }}">{{ nivel }}</div>
+        </div>
+
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="turma-vazio">
+        <i class="bi bi-people"></i>
+        <p>Nenhum aluno nesta turma ainda.</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
