@@ -160,7 +160,7 @@
         <!-- CABEÇALHO -->
         <div class="cadastro-header">
             <a href="{{ url_for('auth.index') }}" class="cadastro-logo">
-                <div class="cadastro-logo-icon">🎓</div>
+                <div class="cadastro-logo-icon" style="background:transparent;padding:2px;"><img src="{{ url_for('static', filename='logo.png') }}" alt="SeducUp" style="width:38px;height:38px;object-fit:contain;"></div>
                 Seduc<span class="up">Up</span>
             </a>
             <h1 class="cadastro-titulo">Criar conta</h1>
@@ -183,23 +183,14 @@
 
         <!-- FORMULÁRIO -->
         <form method="POST" class="cadastro-form">
-            {{ form.hidden_tag() }}
 
             <!-- Nome completo -->
             <div class="form-group">
                 <label class="form-label">Nome completo:</label>
                 <div class="input-icon-wrapper">
                     <i class="bi bi-person"></i>
-                    {{ form.nome(
-                        class='form-control',
-                        placeholder='Seu nome completo'
-                    ) }}
+                    <input type="text" name="nome" class="form-control" placeholder="Seu nome completo" required>
                 </div>
-                {% if form.nome.errors %}
-                    {% for error in form.nome.errors %}
-                    <div class="flash-msg flash-danger mt-1">{{ error }}</div>
-                    {% endfor %}
-                {% endif %}
             </div>
 
             <!-- Matrícula funcional -->
@@ -207,16 +198,8 @@
                 <label class="form-label">Matrícula funcional:</label>
                 <div class="input-icon-wrapper">
                     <i class="bi bi-card-text"></i>
-                    {{ form.matricula(
-                        class='form-control',
-                        placeholder='Ex: COORD-001'
-                    ) }}
+                    <input type="text" name="matricula" class="form-control" placeholder="Ex: COORD-001" required>
                 </div>
-                {% if form.matricula.errors %}
-                    {% for error in form.matricula.errors %}
-                    <div class="flash-msg flash-danger mt-1">{{ error }}</div>
-                    {% endfor %}
-                {% endif %}
             </div>
 
             <!-- E-mail institucional -->
@@ -224,16 +207,8 @@
                 <label class="form-label">E-mail institucional:</label>
                 <div class="input-icon-wrapper">
                     <i class="bi bi-envelope"></i>
-                    {{ form.email(
-                        class='form-control',
-                        placeholder='Exemplo: seu@gmail.com'
-                    ) }}
+                    <input type="email" name="email" class="form-control" placeholder="Exemplo: seu@gmail.com" required>
                 </div>
-                {% if form.email.errors %}
-                    {% for error in form.email.errors %}
-                    <div class="flash-msg flash-danger mt-1">{{ error }}</div>
-                    {% endfor %}
-                {% endif %}
             </div>
 
             <!-- Senha -->
@@ -241,16 +216,8 @@
                 <label class="form-label">Senha:</label>
                 <div class="input-icon-wrapper">
                     <i class="bi bi-lock"></i>
-                    {{ form.senha(
-                        class='form-control',
-                        placeholder='Digite sua senha'
-                    ) }}
+                    <input type="password" name="senha" class="form-control" placeholder="Digite sua senha" required>
                 </div>
-                {% if form.senha.errors %}
-                    {% for error in form.senha.errors %}
-                    <div class="flash-msg flash-danger mt-1">{{ error }}</div>
-                    {% endfor %}
-                {% endif %}
             </div>
 
             <!-- Confirmar senha -->
@@ -258,16 +225,8 @@
                 <label class="form-label">Confirmar senha:</label>
                 <div class="input-icon-wrapper">
                     <i class="bi bi-lock-fill"></i>
-                    {{ form.confirmar_senha(
-                        class='form-control',
-                        placeholder='Confirme sua senha'
-                    ) }}
+                    <input type="password" name="confirmar_senha" class="form-control" placeholder="Confirme sua senha" required>
                 </div>
-                {% if form.confirmar_senha.errors %}
-                    {% for error in form.confirmar_senha.errors %}
-                    <div class="flash-msg flash-danger mt-1">{{ error }}</div>
-                    {% endfor %}
-                {% endif %}
             </div>
 
             <!-- Botão cadastrar -->

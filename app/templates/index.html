@@ -221,16 +221,11 @@
         </div>
 
         <div class="index-left-content">
-            <div class="index-logo-icon">🎓</div>
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="SeducUp" style="width:110px;height:110px;object-fit:contain;margin:0 auto 20px;display:block;">
 
-            <h1 class="index-nome">
-                Seduc<span>Up</span>
-            </h1>
             <p class="index-tagline">
                 Plataforma de reconhecimento estudantil
             </p>
-
-            <div class="index-livro">📚</div>
         </div>
     </div>
 
@@ -241,13 +236,8 @@
             <p class="index-card-sub">Acesse sua conta para continuar</p>
 
             <a href="{{ url_for('auth.selecionar_perfil') }}"
-               class="btn-primary-seducup mb-3">
+               class="btn-primary-seducup">
                 Entrar
-            </a>
-
-            <a href="{{ url_for('auth.cadastro_coordenador') }}"
-               class="btn-outline-seducup">
-                Criar conta
             </a>
 
             <p class="index-card-hint">

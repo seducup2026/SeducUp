@@ -189,7 +189,7 @@
         <!-- CABEÇALHO -->
         <div class="login-header">
             <a href="{{ url_for('auth.index') }}" class="login-logo">
-                <div class="login-logo-icon">🎓</div>
+                <div class="login-logo-icon" style="background:transparent;padding:2px;"><img src="{{ url_for('static', filename='logo.png') }}" alt="SeducUp" style="width:38px;height:38px;object-fit:contain;"></div>
                 Seduc<span class="up">Up</span>
             </a>
             <h1 class="login-titulo">
@@ -218,7 +218,6 @@
 
         <!-- FORMULÁRIO -->
         <form method="POST" class="login-form">
-            {{ form.hidden_tag() }}
 
             <!-- Campo RA ou Matrícula -->
             <div class="form-group">
@@ -228,15 +227,9 @@
                 <div class="input-icon-wrapper">
                     <i class="bi bi-person"></i>
                     {% if tipo == 'coordenador' %}
-                        {{ form.matricula(
-                            class='form-control',
-                            placeholder='0000000000-X'
-                        ) }}
+                        <input type="text" name="matricula" class="form-control" placeholder="0000000000-X">
                     {% else %}
-                        {{ form.ra(
-                            class='form-control',
-                            placeholder='0000000000-X'
-                        ) }}
+                        <input type="text" name="ra" class="form-control" placeholder="0000000000-X">
                     {% endif %}
                 </div>
             </div>
@@ -246,10 +239,7 @@
                 <label class="form-label">Senha:</label>
                 <div class="input-icon-wrapper">
                     <i class="bi bi-lock"></i>
-                    {{ form.senha(
-                        class='form-control',
-                        placeholder='Digite sua senha'
-                    ) }}
+                    <input type="password" name="senha" class="form-control" placeholder="Digite sua senha">
                 </div>
             </div>
 

@@ -58,25 +58,7 @@ def login(tipo):
         else:
             flash('Credenciais incorretas. Verifique e tente novamente.', 'danger')
 
-    # Cria objetos mock de form para o template usar
-    class MockField:
-        def __init__(self, name):
-            self.name = name
-            self.errors = []
-        def __call__(self, **kwargs):
-            field_type = 'password' if 'senha' in self.name else 'text'
-            attrs = ' '.join(f'{k}="{v}"' for k, v in kwargs.items())
-            return f'<input type="{field_type}" name="{self.name}" {attrs}>'
-
-    class MockForm:
-        def __init__(self):
-            self.ra             = MockField('ra')
-            self.matricula      = MockField('matricula')
-            self.senha          = MockField('senha')
-        def hidden_tag(self):
-            return ''
-
-    return render_template('login.html', tipo=tipo, form=MockForm())
+    return render_template('login.html', tipo=tipo)
 
 
 # ----------------------------------------------------------------
@@ -106,7 +88,7 @@ def cadastro_coordenador():
 
         if erro:
             flash(erro, 'danger')
-            return render_template('cadastro_coordenador.html', form=_mock_cadastro_form())
+            return render_template('cadastro_coordenador.html')
 
         senha_hash = bcrypt.generate_password_hash(senha).decode('utf-8')
         coord = Usuario(
@@ -121,7 +103,7 @@ def cadastro_coordenador():
         flash('Conta criada com sucesso! Faça login para continuar.', 'success')
         return redirect(url_for('auth.login', tipo='coordenador'))
 
-    return render_template('cadastro_coordenador.html', form=_mock_cadastro_form())
+    return render_template('cadastro_coordenador.html')
 
 
 def _mock_cadastro_form():
