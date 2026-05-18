@@ -21,8 +21,7 @@
 
     /* ---------- PAINEL ESQUERDO (azul) ---------- */
     .index-left {
-        flex: 0 0 60%;
-        max-width: 60%;
+        flex: 1;
         background: var(--azul-claro);
         display: flex;
         flex-direction: column;
@@ -117,9 +116,8 @@
 
     /* ---------- PAINEL DIREITO (branco) ---------- */
     .index-right {
-        flex: 1;
+        width: 420px;
         min-width: 320px;
-        max-width: 420px;
         background: var(--branco);
         display: flex;
         align-items: center;
@@ -223,11 +221,7 @@
         </div>
 
         <div class="index-left-content">
-            <img src="{{ url_for('static', filename='logo.png') }}"
-                 alt="SeducUp"
-                 onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='block';"
-                 style="width:130px;height:130px;object-fit:contain;margin:0 auto 16px;display:block;filter:drop-shadow(0 4px 16px rgba(0,0,0,0.2));">
-            <div id="logo-fallback" style="display:none;font-family:var(--font-main);font-weight:900;font-size:2.5rem;color:white;margin-bottom:16px;">Seduc<span style="color:#FFD54F;">Up</span></div>
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="SeducUp" style="width:130px;height:130px;object-fit:contain;margin:0 auto 16px;display:block;mix-blend-mode:screen;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.1));">
 
             <p class="index-tagline">
                 Plataforma de reconhecimento estudantil
